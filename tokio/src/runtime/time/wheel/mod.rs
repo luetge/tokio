@@ -35,16 +35,17 @@ pub(crate) struct Wheel {
     /// * ~ 4 min slots / ~ 4 hr range
     /// * ~ 4 hr slots / ~ 12 day range
     /// * ~ 12 day slots / ~ 2 yr range
+    /// * ~ 768 day slots / ~ 128 yr range
     levels: Box<[Level; NUM_LEVELS]>,
 
     /// Entries queued for firing
     pending: EntryList,
 }
 
-/// Number of levels. Each level has 64 slots. By using 6 levels with 64 slots
-/// each, the timer is able to track time up to 2 years into the future with a
+/// Number of levels. Each level has 64 slots. By using 7 levels with 64 slots
+/// each, the timer is able to track time up to 128 years into the future with a
 /// precision of 1 millisecond.
-const NUM_LEVELS: usize = 6;
+const NUM_LEVELS: usize = 7;
 
 /// The maximum duration of a `Sleep`.
 pub(super) const MAX_DURATION: u64 = (1 << (6 * NUM_LEVELS)) - 1;
@@ -288,7 +289,7 @@ fn level_for(elapsed: u64, when: u64) -> usize {
     let leading_zeros = masked.leading_zeros() as usize;
     let significant = 63 - leading_zeros;
 
-    significant / NUM_LEVELS
+    significant / 6
 }
 
 #[cfg(all(test, not(loom)))]
