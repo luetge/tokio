@@ -22,30 +22,34 @@ use super::EntryList;
 /// See `Timer` documentation for some implementation notes.
 #[derive(Debug)]
 pub(crate) struct Wheel {
-    /// The number of milliseconds elapsed since the wheel started.
+    /// The number of nanoseconds elapsed since the wheel started.
     elapsed: u64,
 
     /// Timer wheel.
     ///
     /// Levels:
     ///
-    /// * 1 ms slots / 64 ms range
-    /// * 64 ms slots / ~ 4 sec range
-    /// * ~ 4 sec slots / ~ 4 min range
-    /// * ~ 4 min slots / ~ 4 hr range
-    /// * ~ 4 hr slots / ~ 12 day range
-    /// * ~ 12 day slots / ~ 2 yr range
-    /// * ~ 768 day slots / ~ 128 yr range
+    /// * 1 ns slots / 64 ns range
+    /// * 64 ns slots / ~ 4 us range
+    /// * ~ 4 us slots / ~ 262 us range
+    /// * ~ 262 us slots / ~ 16ms range
+    /// * ~ 16ms slots / ~ 1 sec range
+    /// * ~ 1 sec slots / ~ 70 sec range
+    /// * ~ 70 sec slots / ~ 1 hr range
+    /// * ~ 1 hr slots / ~ 3 day range
+    /// * ~ 3 day slots / ~ 200 day range
+    /// * ~ 200 day slots / ~ 36 yr range
+    /// * ~ 36 yr slots / ~ 2000 yr range
     levels: Box<[Level; NUM_LEVELS]>,
 
     /// Entries queued for firing
     pending: EntryList,
 }
 
-/// Number of levels. Each level has 64 slots. By using 7 levels with 64 slots
-/// each, the timer is able to track time up to 128 years into the future with a
-/// precision of 1 millisecond.
-const NUM_LEVELS: usize = 7;
+/// Number of levels. Each level has 64 slots. By using 11 levels with 64 slots
+/// each, the timer is able to track time up to 2000 years into the future with a
+/// precision of 1 nanosecond.
+const NUM_LEVELS: usize = 9;
 
 /// The maximum duration of a `Sleep`.
 pub(super) const MAX_DURATION: u64 = (1 << (6 * NUM_LEVELS)) - 1;
@@ -60,7 +64,7 @@ impl Wheel {
         }
     }
 
-    /// Returns the number of milliseconds that have elapsed since the timing
+    /// Returns the number of nanoseconds that have elapsed since the timing
     /// wheel's creation.
     pub(crate) fn elapsed(&self) -> u64 {
         self.elapsed

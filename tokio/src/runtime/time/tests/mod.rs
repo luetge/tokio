@@ -213,7 +213,7 @@ fn poll_process_levels() {
     for i in 0..normal_or_miri(1024, 64) {
         let mut entry = Box::pin(TimerEntry::new(
             handle.inner.clone(),
-            handle.inner.driver().clock().now() + Duration::from_millis(i),
+            handle.inner.driver().clock().now() + Duration::from_nanos(i),
         ));
 
         let _ = entry

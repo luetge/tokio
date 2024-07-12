@@ -18,7 +18,7 @@ async fn immediate_sleep() {
 
     // Ready!
     time::sleep_until(now).await;
-    assert_elapsed!(now, ms(1));
+    assert_elapsed!(now, ns(0));
 }
 
 #[tokio::test]
@@ -290,6 +290,10 @@ async fn no_out_of_bounds_close_to_max() {
 
 fn ms(n: u64) -> Duration {
     Duration::from_millis(n)
+}
+
+fn ns(n: u64) -> Duration {
+    Duration::from_nanos(n)
 }
 
 #[tokio::test]
