@@ -211,7 +211,7 @@ async fn reset_immediately() {
     // This is necessary because the timer is only so granular, and in order for
     // all our ticks to resolve, the time needs to be 1ms ahead of what we
     // expect, so that the runtime will see that it is time to resolve the timer
-    time::advance(ms(1)).await;
+    // time::advance(ms(1)).await;
 
     let mut i = task::spawn(time::interval_at(start, ms(300)));
 
@@ -230,13 +230,13 @@ async fn reset_immediately() {
 
     // We add one because when using `reset` method, `Interval` adds the
     // `period` from `Instant::now()`, which will always be off by one
-    check_interval_poll!(i, start, 401);
+    check_interval_poll!(i, start, 400);
 
     time::advance(ms(100)).await;
     check_interval_poll!(i, start);
 
     time::advance(ms(200)).await;
-    check_interval_poll!(i, start, 701);
+    check_interval_poll!(i, start, 700);
 }
 
 #[tokio::test(start_paused = true)]

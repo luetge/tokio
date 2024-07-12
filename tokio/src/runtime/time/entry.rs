@@ -76,7 +76,7 @@ const STATE_MIN_VALUE: u64 = STATE_PENDING_FIRE;
 /// The largest safe integer to use for ticks.
 ///
 /// This value should be updated if any other signal values are added above.
-pub(super) const MAX_SAFE_MILLIS_DURATION: u64 = STATE_MIN_VALUE - 1;
+pub(super) const MAX_SAFE_TICK_DURATION: u64 = STATE_MIN_VALUE - 1;
 
 /// This structure holds the current shared state of the timer - its scheduled
 /// time (if registered), or otherwise the result of the timer completing, as
@@ -547,7 +547,7 @@ impl TimerEntry {
         this.deadline = new_time;
         this.registered = reregister;
 
-        let tick = self.driver().time_source().deadline_to_tick(new_time);
+        let tick = dbg!(self.driver().time_source().deadline_to_tick(dbg!(new_time)));
 
         if self.inner().extend_expiration(tick).is_ok() {
             return;

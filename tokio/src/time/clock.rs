@@ -247,6 +247,10 @@ cfg_test_util! {
             clock
         }
 
+        pub(crate) fn can_pause(&self) -> bool {
+            self.inner.lock().enable_pausing
+        }
+
         pub(crate) fn pause(&self) -> Result<(), &'static str> {
             let mut inner = self.inner.lock();
 

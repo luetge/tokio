@@ -8,7 +8,7 @@
 
 mod entry;
 pub(crate) use entry::TimerEntry;
-use entry::{EntryList, TimerHandle, TimerShared, MAX_SAFE_MILLIS_DURATION};
+use entry::{EntryList, TimerHandle, TimerShared};
 
 mod handle;
 pub(crate) use self::handle::Handle;
@@ -85,12 +85,17 @@ impl AtomicOptionNonZeroU64 {
 ///
 /// The wheels are:
 ///
-/// * Level 0: 64 x 1 millisecond slots.
-/// * Level 1: 64 x 64 millisecond slots.
-/// * Level 2: 64 x ~4 second slots.
-/// * Level 3: 64 x ~4 minute slots.
-/// * Level 4: 64 x ~4 hour slots.
-/// * Level 5: 64 x ~12 day slots.
+/// * 1 ns slots / 64 ns range
+/// * 64 ns slots / ~ 4 us range
+/// * ~ 4 us slots / ~ 262 us range
+/// * ~ 262 us slots / ~ 16ms range
+/// * ~ 16ms slots / ~ 1 sec range
+/// * ~ 1 sec slots / ~ 70 sec range
+/// * ~ 70 sec slots / ~ 1 hr range
+/// * ~ 1 hr slots / ~ 3 day range
+/// * ~ 3 day slots / ~ 200 day range
+/// * ~ 200 day slots / ~ 36 yr range
+/// * ~ 36 yr slots / ~ 2000 yr range
 ///
 /// When the timer processes entries at level zero, it will notify all the
 /// `Sleep` instances as their deadlines have been reached. For all higher
