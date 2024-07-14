@@ -56,44 +56,25 @@ impl Level {
         // From the slot index, calculate the `Instant` at which it needs to be
         // processed. This value *must* be in the future with respect to `now`.
 
-        let level_range = level_range(self.level);
-        let slot_range = slot_range(self.level);
+        let deadline = if self.level == super::NUM_LEVELS - 1 {
+            let level_start = now & !(u64::MAX);
+            level_start + slot as u64 * slot_range(self.level)
+        } else {
+            let level_range = level_range(self.level);
+            let slot_range = slot_range(self.level);
 
-        // Compute the start date of the current level by masking the low bits
-        // of `now` (`level_range` is a power of 2).
-        let level_start = now & !(level_range - 1);
-        let mut deadline = level_start + slot as u64 * slot_range;
-
-        if deadline <= now {
-            // A timer is in a slot "prior" to the current time. This can occur
-            // because we do not have an infinite hierarchy of timer levels, and
-            // eventually a timer scheduled for a very distant time might end up
-            // being placed in a slot that is beyond the end of all of the
-            // arrays.
-            //
-            // To deal with this, we first limit timers to being scheduled no
-            // more than MAX_DURATION ticks in the future; that is, they're at
-            // most one rotation of the top level away. Then, we force timers
-            // that logically would go into the top+1 level, to instead go into
-            // the top level's slots.
-            //
-            // What this means is that the top level's slots act as a
-            // pseudo-ring buffer, and we rotate around them indefinitely. If we
-            // compute a deadline before now, and it's the top level, it
-            // therefore means we're actually looking at a slot in the future.
-            debug_assert_eq!(self.level, super::NUM_LEVELS - 1);
-
-            deadline += level_range;
-        }
+            // Compute the start date of the current level by masking the low bits
+            // of `now` (`level_range` is a power of 2).
+            let level_start = now & !(level_range - 1);
+            level_start + slot as u64 * slot_range
+        };
 
         debug_assert!(
             deadline >= now,
-            "deadline={:016X}; now={:016X}; level={}; lr={:016X}, sr={:016X}, slot={}; occupied={:b}",
+            "deadline={:016X}; now={:016X}; level={}; slot={}; occupied={:b}",
             deadline,
             now,
             self.level,
-            level_range,
-            slot_range,
             slot,
             self.occupied
         );
@@ -167,7 +148,7 @@ fn level_range(level: usize) -> u64 {
     LEVEL_MULT as u64 * slot_range(level)
 }
 
-/// Converts a duration (milliseconds) and a level to a slot position.
+/// Converts a duration (nanoseconds) and a level to a slot position.
 fn slot_for(duration: u64, level: usize) -> usize {
     ((duration >> (level * 6)) % LEVEL_MULT as u64) as usize
 }
