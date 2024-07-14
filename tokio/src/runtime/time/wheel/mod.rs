@@ -49,10 +49,7 @@ pub(crate) struct Wheel {
 /// Number of levels. Each level has 64 slots. By using 11 levels with 64 slots
 /// each, the timer is able to track time up to 2000 years into the future with a
 /// precision of 1 nanosecond.
-const NUM_LEVELS: usize = 9;
-
-/// The maximum duration of a `Sleep`.
-pub(super) const MAX_DURATION: u64 = (1 << (6 * NUM_LEVELS)) - 1;
+const NUM_LEVELS: usize = 11;
 
 impl Wheel {
     /// Creates a new timing wheel.
@@ -283,12 +280,7 @@ fn level_for(elapsed: u64, when: u64) -> usize {
 
     // Mask in the trailing bits ignored by the level calculation in order to cap
     // the possible leading zeros
-    let mut masked = elapsed ^ when | SLOT_MASK;
-
-    if masked >= MAX_DURATION {
-        // Fudge the timer into the top level
-        masked = MAX_DURATION - 1;
-    }
+    let masked = elapsed ^ when | SLOT_MASK;
 
     let leading_zeros = masked.leading_zeros() as usize;
     let significant = 63 - leading_zeros;

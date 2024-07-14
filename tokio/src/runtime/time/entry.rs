@@ -547,7 +547,7 @@ impl TimerEntry {
         this.deadline = new_time;
         this.registered = reregister;
 
-        let tick = dbg!(self.driver().time_source().deadline_to_tick(dbg!(new_time)));
+        let tick = self.driver().time_source().deadline_to_tick(new_time);
 
         if self.inner().extend_expiration(tick).is_ok() {
             return;
