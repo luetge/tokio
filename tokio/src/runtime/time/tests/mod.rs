@@ -262,13 +262,13 @@ fn poll_process_levels_targeted() {
 #[test]
 #[cfg(not(loom))]
 fn instant_to_tick_max() {
-    use crate::runtime::time::entry::MAX_SAFE_MILLIS_DURATION;
+    use crate::runtime::time::entry::MAX_SAFE_TICK_DURATION;
 
     let rt = rt(true);
     let handle = rt.handle().inner.driver().time();
 
     let start_time = handle.time_source.start_time();
-    let long_future = start_time + std::time::Duration::from_millis(MAX_SAFE_MILLIS_DURATION + 1);
+    let long_future = start_time + std::time::Duration::from_millis(MAX_SAFE_TICK_DURATION + 1);
 
-    assert!(handle.time_source.instant_to_tick(long_future) <= MAX_SAFE_MILLIS_DURATION);
+    assert!(handle.time_source.instant_to_tick(long_future) <= MAX_SAFE_TICK_DURATION);
 }
